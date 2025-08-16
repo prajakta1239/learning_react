@@ -1,33 +1,36 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import CartItem from './CartItem';
-import './CartItem.css';
+import React from "react";
+import { useSelector } from "react-redux";
+import CartItem from "./CartItem";
+import "./Cart.css";   // ✅ here
+
 
 const Cart = () => {
-  const items = useSelector(state => state.cart.items);
+  const cartItems = useSelector((state) => state.cart.items);
 
-  // Calculate overall total
-  const totalAmount = items.reduce((sum, item) => sum + item.cost * item.quantity, 0);
-
-  // Calculate total number of items
-  const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => {
+      // remove "$" if cost is a string like "$15"
+      const price = typeof item.cost === "string" ? parseFloat(item.cost.replace("$", "")) : item.cost;
+      return total + price * item.quantity;
+    }, 0);
+  };
 
   return (
     <div className="cart-container">
-      <h2>🛒 Your Cart</h2>
+      <h2>🛒 Your Shopping Cart</h2>
 
-      {items.length === 0 ? (
-        <p>Your cart is empty!</p>
+      {cartItems.length === 0 ? (
+        <p>Your cart is empty</p>
       ) : (
         <>
-          {items.map((item) => (
+          {cartItems.map((item) => (
             <CartItem key={item.name} item={item} />
           ))}
 
-          <p className="total_cart_amount">Total Items: {totalQuantity}</p>
-          <p className="total_cart_amount">Total Amount: ₹{totalAmount}</p>
-
-          <button className="get-started-button1">Proceed to Checkout</button>
+          <div className="cart-summary">
+            <h3>Total: ₹{calculateTotal()}</h3>
+            <button className="checkout-button">Proceed to Checkout</button>
+          </div>
         </>
       )}
     </div>
